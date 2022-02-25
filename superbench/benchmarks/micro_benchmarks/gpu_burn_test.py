@@ -14,7 +14,7 @@ from superbench.benchmarks.micro_benchmarks import MicroBenchmarkWithInvoke
 
 
 class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
-        """The GPU Burn Test benchmark class."""
+    """The GPU Burn Test benchmark class."""
     def __init__(self, name, parameters=''):
         """Constructor.
         Args:
@@ -45,7 +45,7 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
         )
         self._parser.add_argument(
             '--time',
-            type=int
+            type=int,
             default=10,
             help='Length of time to run GPU-Burn for(in seconds)',
 
@@ -70,11 +70,11 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
         
         if self._args.tensor_core:
             command+=' -tc'
-        command+= ' {} '.format(self_args.time)
+        command+= ' {} '.format(self._args.time)
 
         self._commands.append(command)
 
-        return true
+        return True
 
     def _process_raw_result(self, cmd_idx, raw_output):    
         """Function to parse raw results and save the summarized results.
@@ -86,7 +86,7 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
             True if the raw output string is valid and result can be extracted.
         """
 
-        self._result.add_raw_data('raw_output_' + self._args.operation, raw_output)
+        #self._result.add_raw_data('raw_output_gpuburn', raw_output)
         content = raw_output.splitlines()
         gpu_res=[]
         abort=False
@@ -114,14 +114,14 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
                     if 'Tested' in line:
                         continue;
                     if 'GPU' in line:
-                #    print(line.strip('\n').strip('\t') )
-                    gpu_res.append(line.strip('\n').strip('\t'))
+                        gpu_res.append(line.strip('\n').strip('\t'))
 
-                self._result.add_result('GPU_Burn_Time_'+ self._args.time )
+                self._result.add_result('GPU_Burn_Time',self._args.time)
                 for res in gpu_res:
-                   self._result.add_result('GPU_Burn_result_' + res)
+                    #self._result.add_result(res +'=', 1)
+                    self._result.add_raw_data('GPU-Burn_result',res)
             else:
-                self._result.add_result('Failure: Message '+ failure_msg)
+                self._result.add_raw_data('GPU Burn Failure: ', failure_msg)
         
         except BaseException as e:
             logger.error(
@@ -129,7 +129,7 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
                     self._curr_run_index, self._name, raw_output, str(e)
                 )
             )
-            return false
+            return False
 
-        return true
+        return True
 BenchmarkRegistry.register_benchmark('gpu-burn', GpuBurnBenchmark, platform=Platform.CUDA)

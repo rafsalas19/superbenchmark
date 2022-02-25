@@ -16,6 +16,9 @@ sudo docker container ls
 make -C third_party/gpu-burn
 
 #sudo docker exec sb-workspace bash -c "make -C third_party/gpu-burn"
-
+sudo docker cp superbench/benchmarks/micro_benchmarks/gpu_burn_test.py  sb-workspace:/opt/superbench/superbench/benchmarks/micro_benchmarks/
+sudo docker cp superbench/benchmarks/micro_benchmarks/__init__.py  sb-workspace:/opt/superbench/superbench/benchmarks/micro_benchmarks/
 sudo docker cp third_party/gpu-burn/gpu_burn sb-workspace:/opt/superbench/bin
 sudo docker cp third_party/gpu-burn/compare.ptx sb-workspace:/opt/superbench/bin
+sudo docker exec sb-workspace bash -c  'pip uninstall -y superbench'
+sudo docker exec sb-workspace bash -c  'cd /opt/superbench/ && python3 -m pip install .'
