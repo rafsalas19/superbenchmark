@@ -122,7 +122,7 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
                     self._result.add_raw_data('GPU-Burn_result',res)
             else:
                 self._result.add_raw_data('GPU Burn Failure: ', failure_msg)
-        
+                return False 
         except BaseException as e:
             logger.error(
                 'The result format is invalid - round: {}, benchmark: {}, raw output: {}, message: {}.'.format(
