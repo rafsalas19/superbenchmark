@@ -71,8 +71,12 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
         if self._args.tensor_core:
             command+=' -tc'
         command+= ' {} '.format(self._args.time)
+        #copy compare.ptx which needs to be in the working directory
+        compare_copy="cp " + self._args.bin_dir+ "/compare.ptx ./"
+        #remove compare.ptx from working directory
+        compare_rm="rm " + "compare.ptx"
 
-        self._commands.append(command)
+        self._commands.append(compare_copy + " && " + command + " && " + compare_rm)
 
         return True
 
@@ -118,7 +122,10 @@ class GpuBurnBenchmark(MicroBenchmarkWithInvoke):
 
                 self._result.add_result('GPU_Burn_Time',self._args.time)
                 for res in gpu_res:
-                    #self._result.add_result(res +'=', 1)
+                    if 'OK' in res:
+                        self._result.add_result(res.split(':')[0].replace(' ','_') + '_Pass', 1 )
+                    else:
+                        self._result.add_result(res.split(':')[0].replace(' ','_') + '_Fail', 1 )
                     self._result.add_raw_data('GPU-Burn_result',res)
             else:
                 self._result.add_raw_data('GPU Burn Failure: ', failure_msg)
